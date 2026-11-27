@@ -28,7 +28,7 @@ function save(){
 /* CAMERA */
 
 
-function moveCamera(index, zoom=1.48){
+function moveCamera(index, zoom=2.5){
  const station=STATIONS[index];
  if(!station || !viewport || !canvas)return;
 
