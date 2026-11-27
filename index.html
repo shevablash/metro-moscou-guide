@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17191c">
+<title>Voyage dans le métro de Moscou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<section class="intro full" id="intro"><div class="intro-photo"></div><div class="shade"></div><div class="intro-content">
+<p class="eyebrow">MOSCOU · RUSSIE</p><h1>BIENVENUE À MOSCOU</h1><p class="subtitle">Au cœur du métro de Moscou</p><p class="intro-copy">Un voyage à travers huit stations emblématiques du métro moscovite.</p><button class="primary" id="start">COMMENCER LE VOYAGE</button>
+</div><button class="scroll-hint" id="scrollHint"><span class="mouse"></span>DÉFILER POUR CONTINUER</button></section>
+<section class="map-scene full" id="mapScene"><header class="header"><div><p class="eyebrow">MOSCOU · RUSSIE</p><h2>VOYAGE DANS LE MÉTRO</h2></div><div class="progress"><div><span id="stepLabel">ÉTAPE 01 / 08</span><span id="percent">0 %</span></div><div class="track"><i id="fill"></i></div></div></header>
+<div class="map-stage"><div class="map-viewport"><div class="map-canvas" id="mapCanvas"><img class="metro-map" src="assets/metro-map.png" alt="Schéma original du métro de Moscou"><svg id="route" viewBox="0 0 1000 600" preserveAspectRatio="none"></svg><div id="markers"></div></div></div><p class="hint">SÉLECTIONNEZ LA STATION ACTIVE POUR CONTINUER</p><button class="reset" id="reset" title="Recommencer">↺</button></div></section>
+</main>
+<div class="backdrop" id="modal" aria-hidden="true"><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="close" id="close" aria-label="Fermer">×</button><div class="video-heading"><p class="eyebrow" id="modalStep">ÉTAPE 01 / 08</p><h2 id="modalTitle">Nom français de la station</h2><p class="russian" id="modalRussian">Название станции</p><p class="description" id="modalDescription"></p></div><div class="video-frame"><video id="video" controls playsinline preload="none" hidden></video><div class="placeholder" id="placeholder"><div class="play">▶</div><h3>Votre découverte commence ici</h3><p>La vidéo de cette station sera ajoutée prochainement.</p><span>CONTENU VIDÉO À VENIR</span></div></div><div class="video-footer"><p id="videoStatus">Regardez la vidéo jusqu’à la fin pour débloquer la suite.</p><button class="complete" id="complete" hidden>MARQUER COMME TERMINÉ</button></div></section></div>
+<div class="finish" id="finish" aria-hidden="true"><div class="finish-card"><div class="star">✦</div><p class="eyebrow">MOSCOU · RUSSIE</p><h2>Félicitations !</h2><p>Vous avez découvert le métro de Moscou.</p><button class="primary" id="replay">REVOIR LE VOYAGE</button></div></div>
+<script src="script.js"></script></body></html>
