@@ -1,0 +1,659 @@
+* {
+    box-sizing: border-box
+}
+
+:root {
+    --ink: #17191c;
+    --amber: #B87525;
+    --green: #527F73;
+    --locked: #9AA5A5;
+    font-family: Montserrat, Arial, sans-serif
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory
+}
+
+body {
+    margin: 0;
+    background: var(--ink);
+    color: #fff
+}
+
+button {
+    font: inherit
+}
+
+.full {
+    height: 100svh;
+    min-height: 100svh;
+    position: relative;
+    overflow: hidden;
+    scroll-snap-align: start
+}
+
+.intro {
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+    background: #17191c
+}
+
+.intro-photo{
+  position:absolute;
+  inset:-3%;
+  z-index:-2;
+  background-image:url("assets/intro-station.jpg");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  transform:scale(1.04);
+  animation:zoom 28s ease-in-out infinite alternate;
+}
+
+.shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, #0006, #0009)
+}
+
+.intro-content {
+    text-align: center;
+    width: min(900px, 90vw);
+    padding: 30px 16px 70px;
+    animation: rise 1s both
+}
+
+.eyebrow {
+    color: #d2b58e;
+    letter-spacing: .22em;
+    font-size: .68rem;
+    font-weight: 600;
+    margin: 0 0 18px
+}
+
+.intro h1, .finish h2 {
+    font: 600 clamp(2.1rem, 5vw, 4.8rem)/1.12 'Playfair Display', Georgia, serif;
+    letter-spacing: .035em;
+    margin: 0
+}
+
+.subtitle {
+    font: 500 clamp(1.1rem, 2.2vw, 1.65rem) 'Playfair Display', Georgia, serif;
+    margin: 22px 0 12px
+}
+
+.intro-copy {
+    color: #ffffffc7;
+    line-height: 1.8;
+    font-size: .92rem;
+    max-width: 560px;
+    margin: 0 auto 34px
+}
+
+.primary {
+    background: var(--amber);
+    color: white;
+    border: 1px solid #ffffff33;
+    padding: 16px 27px;
+    letter-spacing: .11em;
+    font-size: .72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .25s
+}
+
+.primary:hover {
+    background: #a66620;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px #0005
+}
+
+.scroll-hint {
+    position: absolute;
+    bottom: 27px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    color: #ffffffa6;
+    background: none;
+    border: 0;
+    letter-spacing: .16em;
+    font-size: .58rem;
+    cursor: pointer
+}
+
+.mouse {
+    width: 17px;
+    height: 26px;
+    border: 1px solid #ffffff9c;
+    border-radius: 12px;
+    position: relative
+}
+
+.mouse:after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 5px;
+    background: white;
+    left: 7px;
+    top: 5px;
+    animation: wheel 1.5s infinite
+}
+
+.map-scene {
+    background: var(--ink);
+    display: flex;
+    flex-direction: column
+}
+
+.header {
+    min-height: 94px;
+    padding: 17px clamp(18px, 4vw, 54px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    z-index: 2
+}
+
+.header .eyebrow {
+    margin: 0 0 6px;
+    font-size: .58rem
+}
+
+.header h2 {
+    margin: 0;
+    font: 600 1rem 'Playfair Display', Georgia, serif;
+    letter-spacing: .12em
+}
+
+.progress {
+    width: min(310px, 38vw)
+}
+
+.progress>div:first-child {
+    display: flex;
+    justify-content: space-between;
+    color: #e8e5df;
+    font-size: .66rem;
+    letter-spacing: .1em;
+    margin-bottom: 9px
+}
+
+.track {
+    height: 3px;
+    background: #ffffff26;
+    overflow: hidden
+}
+
+.track i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--amber);
+    transition: width .6s
+}
+
+.map-stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    padding: 0 20px 36px;
+    display: grid;
+    place-items: center
+}
+
+
+.map-viewport {
+    width: 100%;
+    height: 100%;
+    max-height: calc(100svh - 145px);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    position: relative;
+    background: #000000;
+    scrollbar-width: none;
+    overscroll-behavior: none;
+}
+
+.map-viewport::-webkit-scrollbar {
+    display: none;
+}
+
+.map-canvas {
+    height: 100%;
+    width: min(100%, calc((100svh - 145px) * 1597 / 2048));
+    aspect-ratio: 1597 / 2048;
+    max-width: 100%;
+    position: relative;
+    line-height: 0;
+    flex-shrink: 0;
+
+    --camera-x: 0px;
+    --camera-y: 0px;
+    --camera-zoom: 1;
+
+    transform:
+        translate3d(var(--camera-x), var(--camera-y), 0)
+        scale(var(--camera-zoom));
+
+    transform-origin: center center;
+    transition: transform 1.35s cubic-bezier(.22,.75,.25,1);
+    will-change: transform;
+}
+
+.map-canvas.camera-active {
+    will-change: transform;
+}
+
+.metro-map {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none
+}
+
+.map-canvas svg, #markers {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none
+}
+
+#route polyline {
+    fill: none;
+    stroke: var(--amber);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 12 10;
+    filter: drop-shadow(0 1px 2px white)
+}
+
+.marker {
+    position: absolute;
+    width: clamp(8px, 0.775vw, 11.5px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid white;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-weight: 700;
+    font-size: clamp(.35rem, 0.5vw, .4rem);
+    box-shadow: 0 1px 2px #25312d55;
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 1
+}
+
+.marker.active {
+    background: var(--amber);
+    box-shadow: 0 0 0 2px #b8752530, 0 0 5px #b8752570;
+    animation: pulse 2.4s infinite
+}
+
+.marker.done {
+    background: var(--green)
+}
+
+.marker.locked {
+    background: var(--locked);
+    cursor: not-allowed;
+    opacity: .78
+}
+
+.hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: #aeb5b4;
+    font-size: .58rem;
+    letter-spacing: .13em;
+    text-align: center
+}
+
+.reset {
+    position: absolute;
+    right: clamp(18px, 4vw, 54px);
+    bottom: 8px;
+    border: 1px solid #ffffff38;
+    color: #cbd0ce;
+    background: #25292b;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: #050708d1;
+    backdrop-filter: blur(7px);
+    display: grid;
+    place-items: center;
+    padding: 3vh 3vw;
+    opacity: 0;
+    visibility: hidden;
+    transition: .3s
+}
+
+.backdrop.open {
+    opacity: 1;
+    visibility: visible
+}
+
+.dialog {
+    position: relative;
+    width: min(1180px, 94vw);
+    height: min(92vh, 900px);
+    overflow: auto;
+    background: #1c2022;
+    border: 1px solid #ffffff20;
+    box-shadow: 0 25px 90px #0009;
+    padding: clamp(22px, 3vw, 42px);
+    display: flex;
+    flex-direction: column
+}
+
+.close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: none;
+    border: 0;
+    color: #d6d9d7;
+    font-size: 2rem;
+    cursor: pointer
+}
+
+.video-heading {
+    padding-right: 38px
+}
+
+.video-heading .eyebrow {
+    margin-bottom: 10px
+}
+
+.video-heading h2 {
+    font: 600 clamp(1.7rem, 3vw, 2.7rem) 'Playfair Display', Georgia, serif;
+    margin: 0 0 6px
+}
+
+.russian {
+    color: #c4c9c6;
+    font-size: .95rem;
+    margin: 0 0 8px
+}
+
+.description {
+    color: #aeb5b4;
+    font-size: .8rem;
+    line-height: 1.6;
+    margin: 0 0 20px
+}
+
+.video-frame {
+    background: #0b0d0e;
+    width: 100%;
+    aspect-ratio: 16/9;
+    max-height: 58vh;
+    display: grid;
+    place-items: center;
+    overflow: hidden
+}
+
+.video-frame video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain
+}
+
+.placeholder {
+    text-align: center;
+    padding: 25px;
+    color: #d8dcd9
+}
+
+.play {
+    width: 58px;
+    height: 58px;
+    border: 1px solid var(--amber);
+    color: #d69b52;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 18px;
+    padding-left: 4px
+}
+
+.placeholder h3 {
+    font: 500 1.35rem 'Playfair Display', Georgia, serif;
+    margin: 0 0 8px
+}
+
+.placeholder p {
+    color: #9da5a2;
+    font-size: .8rem
+}
+
+.placeholder span {
+    display: inline-block;
+    margin-top: 14px;
+    color: #d19a58;
+    font-size: .58rem;
+    letter-spacing: .17em
+}
+
+.video-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 18px
+}
+
+.video-footer p {
+    color: #aeb5b4;
+    font-size: .72rem;
+    line-height: 1.5
+}
+
+.complete {
+    background: var(--green);
+    color: white;
+    border: 0;
+    padding: 13px 18px;
+    cursor: pointer;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .08em
+}
+
+.finish {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: radial-gradient(circle at center, #333b39, #111416 70%);
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: .4s
+}
+
+.finish.open {
+    opacity: 1;
+    visibility: visible
+}
+
+.finish-card {
+    text-align: center;
+    max-width: 650px
+}
+
+.star {
+    color: #d5a15f;
+    font-size: 3rem;
+    margin-bottom: 18px
+}
+
+.finish h2 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    margin-bottom: 16px
+}
+
+.finish-card>p:not(.eyebrow) {
+    color: #c7ceca;
+    margin: 0 0 32px
+}
+
+button:focus-visible {
+    outline: 3px solid #e7b56e;
+    outline-offset: 4px
+}
+
+@keyframes zoom {
+    to {
+        transform: scale(1.12)
+    }
+}
+
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(15px)
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0)
+    }
+}
+
+@keyframes wheel {
+    0% {
+        opacity: 0;
+        transform: translateY(0)
+    }
+
+    40% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(7px)
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 4px #b8752528, 0 0 14px #b8752560
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px #b8752510, 0 0 22px #b8752580
+    }
+}
+
+@media(max-width:700px) {
+    html {
+        scroll-snap-type: y proximity
+    }
+
+    .header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 18px 12px
+    }
+
+    .progress {
+        width: 100%
+    }
+
+    .map-stage {
+        padding: 0 8px 42px
+    }
+
+    
+    .map-viewport{
+        width:100%;
+        max-height:calc(100svh - 175px);
+        place-items:center;
+        overflow:hidden;
+    }
+
+    .map-canvas {
+        width: min(100%, calc((100svh - 175px) * 1597 / 2048));
+        height: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+
+    .hint {
+        font-size: .49rem;
+        bottom: 15px
+    }
+
+    .dialog {
+        width: 96vw;
+        height: 94vh;
+        padding: 24px 17px
+    }
+
+    .video-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px
+    }
+
+    .complete {
+        width: 100%
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important
+    }
+}
+
+/* Скрываем полосу прокрутки, сохраняя прокрутку */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
