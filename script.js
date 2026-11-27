@@ -12,6 +12,9 @@ const STATIONS = [
 ];
 
 const $=id=>document.getElementById(id);
+const viewport=document.querySelector(".map-viewport");
+const canvas=$("mapCanvas");
+const video=$("video");
 
 let completed=0;
 let opened=null;
@@ -24,42 +27,37 @@ function save(){
 
 /* CAMERA */
 
-function moveCamera(index,zoom=1.48){
+
+function moveCamera(index, zoom=1.48){
  const station=STATIONS[index];
- if(!station)return;
+ if(!station || !viewport || !canvas)return;
 
  clearTimeout(cameraTimer);
 
  requestAnimationFrame(()=>{
   const vr=viewport.getBoundingClientRect();
-  const cr=canvas.getBoundingClientRect();
-
   const w=canvas.offsetWidth;
   const h=canvas.offsetHeight;
 
-  if(!w||!h||!vr.width||!vr.height)return;
+  if(!w || !h || !vr.width || !vr.height)return;
+
+  // Исходное положение карты по центру окна.
+  const baseLeft=(vr.width-w)/2;
+  const baseTop=(vr.height-h)/2;
 
   const targetX=station.x/100*w;
   const targetY=station.y/100*h;
 
-  let dx=vr.width/2-(cr.left-vr.left+w/2+zoom*(targetX-w/2));
-  let dy=vr.height/2-(cr.top-vr.top+h/2+zoom*(targetY-h/2));
+  let dx=vr.width/2-baseLeft-w/2-zoom*(targetX-w/2);
+  let dy=vr.height/2-baseTop-h/2-zoom*(targetY-h/2);
 
-  // Ne laisse pas apparaître de zones vides autour de la carte.
-  const left=cr.left-vr.left;
-  const top=cr.top-vr.top;
+  const minX=vr.width-baseLeft-w/2*(1+zoom);
+  const maxX=-baseLeft-w/2*(1-zoom);
+  const minY=vr.height-baseTop-h/2*(1+zoom);
+  const maxY=-baseTop-h/2*(1-zoom);
 
-  if(w*zoom>vr.width){
-   dx=Math.max(vr.width-(left+w*zoom),Math.min(-left,dx));
-  }else{
-   dx=(vr.width-w*zoom)/2-left;
-  }
-
-  if(h*zoom>vr.height){
-   dy=Math.max(vr.height-(top+h*zoom),Math.min(-top,dy));
-  }else{
-   dy=(vr.height-h*zoom)/2-top;
-  }
+  dx=Math.max(minX,Math.min(maxX,dx));
+  dy=Math.max(minY,Math.min(maxY,dy));
 
   canvas.style.setProperty("--camera-x",dx+"px");
   canvas.style.setProperty("--camera-y",dy+"px");
@@ -67,6 +65,7 @@ function moveCamera(index,zoom=1.48){
   canvas.classList.add("camera-active");
  });
 }
+
 
 function resetCamera(){
  clearTimeout(cameraTimer);

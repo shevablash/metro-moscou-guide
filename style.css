@@ -211,52 +211,48 @@ button {
 }
 
 
-.map-viewport{
-  width:100%;
-  height:100%;
-  max-height:calc(100svh - 145px);
-  overflow:hidden;
-  display:grid;
-  place-items:center;
-  position:relative;
-  background:#f0f4ef;
-  scrollbar-width:none;
-  overscroll-behavior:none;
+.map-viewport {
+    width: 100%;
+    height: 100%;
+    max-height: calc(100svh - 145px);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    position: relative;
+    background: #f0f4ef;
+    scrollbar-width: none;
+    overscroll-behavior: none;
 }
 
-.map-viewport::-webkit-scrollbar{
-  display:none;
+.map-viewport::-webkit-scrollbar {
+    display: none;
 }
 
-.map-canvas{
-  height:100%;
-  width:auto;
-  aspect-ratio:1597/2048;
-  max-width:100%;
-  position:relative;
-  line-height:0;
-  flex-shrink:0;
+.map-canvas {
+    height: 100%;
+    width: min(100%, calc((100svh - 145px) * 1597 / 2048));
+    aspect-ratio: 1597 / 2048;
+    max-width: 100%;
+    position: relative;
+    line-height: 0;
+    flex-shrink: 0;
 
-  --camera-x:0px;
-  --camera-y:0px;
-  --camera-zoom:1;
+    --camera-x: 0px;
+    --camera-y: 0px;
+    --camera-zoom: 1;
 
-  transform:
-    translate3d(var(--camera-x),var(--camera-y),0)
-    scale(var(--camera-zoom));
+    transform:
+        translate3d(var(--camera-x), var(--camera-y), 0)
+        scale(var(--camera-zoom));
 
-  transform-origin:center center;
-
-  transition:
-    transform 1.35s cubic-bezier(.22,.75,.25,1);
-
-  will-change:transform;
+    transform-origin: center center;
+    transition: transform 1.35s cubic-bezier(.22,.75,.25,1);
+    will-change: transform;
 }
 
-.map-canvas.camera-active{
-  will-change:transform;
+.map-canvas.camera-active {
+    will-change: transform;
 }
-
 
 .metro-map {
     display: block;
@@ -605,11 +601,11 @@ button:focus-visible {
         overflow:hidden;
     }
 
-    .map-canvas{
-        width:auto;
-        height:100%;
-        min-width:0;
-        max-width:100%;
+    .map-canvas {
+        width: min(100%, calc((100svh - 175px) * 1597 / 2048));
+        height: 100%;
+        min-width: 0;
+        max-width: 100%;
     }
 
 
