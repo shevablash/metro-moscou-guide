@@ -281,26 +281,29 @@ button {
 
 .marker {
     position: absolute;
-    width: clamp(8px, 0.775vw, 11.5px);
+    width: clamp(4px, 0.4vw, 6px);
     aspect-ratio: 1;
     transform: translate(-50%, -50%);
     border-radius: 50%;
     border: 1px solid white;
     display: grid;
     place-items: center;
+    text-align: center;
     color: white;
     font-weight: 700;
-    font-size: clamp(.35rem, 0.5vw, .4rem);
+    font-size: 3px;
+    line-height: 1;
+    padding: 0;
     box-shadow: 0 1px 2px #25312d55;
     pointer-events: auto;
     cursor: pointer;
-    z-index: 1
+    z-index: 1;
 }
 
 .marker.active {
     background: var(--amber);
-    box-shadow: 0 0 0 2px #b8752530, 0 0 5px #b8752570;
-    animation: pulse 2.4s infinite
+    box-shadow: 0 0 0 1px #b8752530, 0 0 3px #b8752570;
+    animation: pulse 2.4s infinite;
 }
 
 .marker.done {
