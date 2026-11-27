@@ -305,6 +305,16 @@ button {
     -webkit-appearance: none;
 }
 
+.marker span {
+    display: block;
+    width: 100%;
+    text-align: center;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    transform: translate(0, 0);
+}
+
 .marker.active {
     background: var(--amber);
     box-shadow: 0 0 0 1.5px #b8752530, 0 0 4px #b8752570;

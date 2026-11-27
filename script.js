@@ -109,7 +109,9 @@ function render(){
   b.className=`marker ${state}`;
   b.style.left=s.x+"%";
   b.style.top=s.y+"%";
-  b.textContent=i<completed?"✓":s.id;
+  const label=document.createElement("span");
+  label.textContent=i<completed?"✓":s.id;
+  b.appendChild(label);
   b.title=s.nameFr;
   b.setAttribute("aria-label",`${s.id}. ${s.nameFr}`);
   b.disabled=i>completed;
