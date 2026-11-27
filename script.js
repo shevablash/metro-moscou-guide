@@ -11,7 +11,6 @@ const STATIONS = [
  {id:8,nameFr:"Station 8",nameRu:"Станция 8",descriptionFr:"La dernière étape de votre voyage dans le métro de Moscou.",x:34,y:76,videoUrl:""}
 ];
 
-const KEY="moscowMetroGuideProgress_v1";
 const $=id=>document.getElementById(id);
 
 let completed=0;
@@ -19,16 +18,8 @@ let opened=null;
 let previousFocus=null;
 let cameraTimer=null;
 
-try {
- completed=Math.max(0,Math.min(8,Number(localStorage.getItem(KEY)||0)||0));
-} catch(e){}
-
-const video=$("video");
-const viewport=$("mapScene").querySelector(".map-viewport");
-const canvas=$("mapCanvas");
-
 function save(){
- try{localStorage.setItem(KEY,String(completed));}catch(e){}
+  // Прогресс хранится только до перезагрузки страницы.
 }
 
 /* CAMERA */
