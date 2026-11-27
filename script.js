@@ -1,9 +1,5 @@
-/* CONFIGURATION DES 8 STATIONS
-   Remplacez les noms temporaires, les coordonnées x/y et les URL vidéo ci-dessous.
-   x/y = pourcentages de la carte (0-100), mesurés depuis le coin supérieur gauche.
-   videoUrl = URL directe du fichier MP4 (laisser "" pour afficher la zone vidéo à venir).
-   COORDONNÉES ET NOMS ACTUELS : TEMPORAIRES, À REMPLACER AVANT PUBLICATION FINALE.
-*/
+
+/* CONFIGURATION DES 8 STATIONS */
 const STATIONS = [
  {id:1,nameFr:"Station 1",nameRu:"Станция 1",descriptionFr:"Découvrez cette station emblématique du métro de Moscou.",x:18,y:22,videoUrl:""},
  {id:2,nameFr:"Station 2",nameRu:"Станция 2",descriptionFr:"Une nouvelle étape de notre voyage souterrain.",x:31,y:35,videoUrl:""},
@@ -14,17 +10,275 @@ const STATIONS = [
  {id:7,nameFr:"Station 7",nameRu:"Станция 7",descriptionFr:"Encore une étape avant la fin du voyage.",x:58,y:70,videoUrl:""},
  {id:8,nameFr:"Station 8",nameRu:"Станция 8",descriptionFr:"La dernière étape de votre voyage dans le métro de Moscou.",x:34,y:76,videoUrl:""}
 ];
-const KEY="moscowMetroGuideProgress_v1", $=id=>document.getElementById(id);
-let completed=0, opened=null, previousFocus=null;
-try{completed=Math.max(0,Math.min(8,Number(localStorage.getItem(KEY)||0)||0));}catch(e){}
+
+const KEY="moscowMetroGuideProgress_v1";
+const $=id=>document.getElementById(id);
+
+let completed=0;
+let opened=null;
+let previousFocus=null;
+let cameraTimer=null;
+
+try {
+ completed=Math.max(0,Math.min(8,Number(localStorage.getItem(KEY)||0)||0));
+} catch(e){}
+
 const video=$("video");
-function save(){try{localStorage.setItem(KEY,String(completed));}catch(e){}}
-function drawRoute(){const svg=$("route");svg.innerHTML="";if(completed<1)return;const pts=STATIONS.slice(0,Math.min(completed+1,STATIONS.length)).map(s=>`${s.x*10},${s.y*6}`).join(" ");const line=document.createElementNS("http://www.w3.org/2000/svg","polyline");line.setAttribute("points",pts);svg.appendChild(line);}
-function render(){const layer=$("markers");layer.innerHTML="";STATIONS.forEach((s,i)=>{const b=document.createElement("button"),state=i<completed?"done":i===completed?"active":"locked";b.className=`marker ${state}`;b.style.left=s.x+"%";b.style.top=s.y+"%";b.textContent=i<completed?"✓":s.id;b.title=s.nameFr;b.setAttribute("aria-label",`${s.id}. ${s.nameFr}`);b.disabled=i>completed;if(i<=completed)b.onclick=()=>openStation(i);layer.appendChild(b);});drawRoute();$("stepLabel").textContent=completed===8?"VOYAGE TERMINÉ":`ÉTAPE ${String(completed+1).padStart(2,"0")} / 08`;$("percent").textContent=Math.round(completed/8*100)+" %";$("fill").style.width=completed/8*100+"%";}
-function openStation(i){if(i>completed)return;opened=i;previousFocus=document.activeElement;const s=STATIONS[i];$("modalStep").textContent=`ÉTAPE ${String(i+1).padStart(2,"0")} / 08`;$("modalTitle").textContent=s.nameFr;$("modalRussian").textContent=s.nameRu;$("modalDescription").textContent=s.descriptionFr;$("videoStatus").textContent=i<completed?"Vous avez déjà terminé cette étape. Vous pouvez revoir la vidéo.":"Regardez la vidéo jusqu’à la fin pour débloquer la suite.";$("complete").hidden=i<completed||!!s.videoUrl;$("placeholder").hidden=!!s.videoUrl;video.hidden=!s.videoUrl;video.pause();video.removeAttribute("src");video.load();if(s.videoUrl){video.src=s.videoUrl;video.load();}$("modal").classList.add("open");$("modal").setAttribute("aria-hidden","false");document.body.style.overflow="hidden";$("close").focus();}
-function closeModal(){ $("modal").classList.remove("open");$("modal").setAttribute("aria-hidden","true");video.pause();document.body.style.overflow="";if(previousFocus)previousFocus.focus(); }
-function finishStep(){if(opened===null||opened!==completed)return;completed=Math.min(8,completed+1);save();closeModal();render();if(completed===8)setTimeout(()=>{$("finish").classList.add("open");$("finish").setAttribute("aria-hidden","false");},450);}
-video.addEventListener("ended",()=>{if(opened===completed)finishStep();});$("complete").onclick=finishStep;$("close").onclick=closeModal;$("modal").addEventListener("click",e=>{if(e.target===$("modal"))closeModal();});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("modal").classList.contains("open"))closeModal();});
-function goMap(){$("mapScene").scrollIntoView({behavior:"smooth"});}$("start").onclick=goMap;$("scrollHint").onclick=goMap;
-function reset(){if(!confirm("Recommencer le voyage depuis la première station ?"))return;completed=0;save();$("finish").classList.remove("open");$("finish").setAttribute("aria-hidden","true");render();}
-$("reset").onclick=reset;$("replay").onclick=()=>{completed=0;save();$("finish").classList.remove("open");$("finish").setAttribute("aria-hidden","true");render();$("intro").scrollIntoView({behavior:"smooth"});};render();
+const viewport=$("mapScene").querySelector(".map-viewport");
+const canvas=$("mapCanvas");
+
+function save(){
+ try{localStorage.setItem(KEY,String(completed));}catch(e){}
+}
+
+/* CAMERA */
+
+function moveCamera(index,zoom=1.48){
+ const station=STATIONS[index];
+ if(!station)return;
+
+ clearTimeout(cameraTimer);
+
+ requestAnimationFrame(()=>{
+  const vr=viewport.getBoundingClientRect();
+  const cr=canvas.getBoundingClientRect();
+
+  const w=canvas.offsetWidth;
+  const h=canvas.offsetHeight;
+
+  if(!w||!h||!vr.width||!vr.height)return;
+
+  const targetX=station.x/100*w;
+  const targetY=station.y/100*h;
+
+  let dx=vr.width/2-(cr.left-vr.left+w/2+zoom*(targetX-w/2));
+  let dy=vr.height/2-(cr.top-vr.top+h/2+zoom*(targetY-h/2));
+
+  // Ne laisse pas apparaître de zones vides autour de la carte.
+  const left=cr.left-vr.left;
+  const top=cr.top-vr.top;
+
+  if(w*zoom>vr.width){
+   dx=Math.max(vr.width-(left+w*zoom),Math.min(-left,dx));
+  }else{
+   dx=(vr.width-w*zoom)/2-left;
+  }
+
+  if(h*zoom>vr.height){
+   dy=Math.max(vr.height-(top+h*zoom),Math.min(-top,dy));
+  }else{
+   dy=(vr.height-h*zoom)/2-top;
+  }
+
+  canvas.style.setProperty("--camera-x",dx+"px");
+  canvas.style.setProperty("--camera-y",dy+"px");
+  canvas.style.setProperty("--camera-zoom",zoom);
+  canvas.classList.add("camera-active");
+ });
+}
+
+function resetCamera(){
+ clearTimeout(cameraTimer);
+ canvas.style.setProperty("--camera-x","0px");
+ canvas.style.setProperty("--camera-y","0px");
+ canvas.style.setProperty("--camera-zoom","1");
+ canvas.classList.remove("camera-active");
+}
+
+/* ROUTE */
+
+function drawRoute(){
+ const svg=$("route");
+ svg.innerHTML="";
+
+ if(completed<1)return;
+
+ const pts=STATIONS
+  .slice(0,Math.min(completed+1,STATIONS.length))
+  .map(s=>`${s.x*10},${s.y*6}`)
+  .join(" ");
+
+ const line=document.createElementNS(
+  "http://www.w3.org/2000/svg","polyline"
+ );
+
+ line.setAttribute("points",pts);
+ svg.appendChild(line);
+}
+
+/* STATIONS */
+
+function render(){
+ const layer=$("markers");
+ layer.innerHTML="";
+
+ STATIONS.forEach((s,i)=>{
+  const b=document.createElement("button");
+  const state=i<completed?"done":i===completed?"active":"locked";
+
+  b.className=`marker ${state}`;
+  b.style.left=s.x+"%";
+  b.style.top=s.y+"%";
+  b.textContent=i<completed?"✓":s.id;
+  b.title=s.nameFr;
+  b.setAttribute("aria-label",`${s.id}. ${s.nameFr}`);
+  b.disabled=i>completed;
+
+  if(i<=completed)b.onclick=()=>openStation(i);
+
+  layer.appendChild(b);
+ });
+
+ drawRoute();
+
+ $("stepLabel").textContent=
+  completed===8
+   ?"VOYAGE TERMINÉ"
+   :`ÉTAPE ${String(completed+1).padStart(2,"0")} / 08`;
+
+ $("percent").textContent=Math.round(completed/8*100)+" %";
+ $("fill").style.width=completed/8*100+"%";
+}
+
+/* VIDEO MODAL */
+
+function openStation(i){
+ if(i>completed)return;
+
+ opened=i;
+ previousFocus=document.activeElement;
+
+ moveCamera(i);
+
+ const s=STATIONS[i];
+
+ $("modalStep").textContent=`ÉTAPE ${String(i+1).padStart(2,"0")} / 08`;
+ $("modalTitle").textContent=s.nameFr;
+ $("modalRussian").textContent=s.nameRu;
+ $("modalDescription").textContent=s.descriptionFr;
+
+ $("videoStatus").textContent=
+  i<completed
+   ?"Vous avez déjà terminé cette étape. Vous pouvez revoir la vidéo."
+   :"Regardez la vidéo jusqu’à la fin pour débloquer la suite.";
+
+ $("complete").hidden=i<completed||!!s.videoUrl;
+ $("placeholder").hidden=!!s.videoUrl;
+ video.hidden=!s.videoUrl;
+
+ video.pause();
+ video.removeAttribute("src");
+ video.load();
+
+ if(s.videoUrl){
+  video.src=s.videoUrl;
+  video.load();
+ }
+
+ $("modal").classList.add("open");
+ $("modal").setAttribute("aria-hidden","false");
+ document.body.style.overflow="hidden";
+ $("close").focus();
+}
+
+function closeModal(){
+ $("modal").classList.remove("open");
+ $("modal").setAttribute("aria-hidden","true");
+
+ video.pause();
+ document.body.style.overflow="";
+
+ if(previousFocus)previousFocus.focus();
+}
+
+function finishStep(){
+ if(opened===null||opened!==completed)return;
+
+ completed=Math.min(8,completed+1);
+ save();
+
+ closeModal();
+ render();
+
+ if(completed===8){
+  resetCamera();
+
+  cameraTimer=setTimeout(()=>{
+   $("finish").classList.add("open");
+   $("finish").setAttribute("aria-hidden","false");
+  },1100);
+ }else{
+  // La caméra accompagne le voyage vers la station suivante.
+  moveCamera(completed);
+ }
+}
+
+/* EVENTS */
+
+video.addEventListener("ended",()=>{
+ if(opened===completed)finishStep();
+});
+
+$("complete").onclick=finishStep;
+$("close").onclick=closeModal;
+
+$("modal").addEventListener("click",e=>{
+ if(e.target===$("modal"))closeModal();
+});
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&$("modal").classList.contains("open")){
+  closeModal();
+ }
+});
+
+function goMap(){
+ $("mapScene").scrollIntoView({behavior:"smooth"});
+
+ cameraTimer=setTimeout(()=>{
+  if(completed<8)moveCamera(completed);
+  else resetCamera();
+ },650);
+}
+
+$("start").onclick=goMap;
+$("scrollHint").onclick=goMap;
+
+/* RESET AND REPLAY */
+
+function reset(){
+ if(!confirm("Recommencer le voyage depuis la première station ?"))return;
+
+ completed=0;
+ save();
+
+ $("finish").classList.remove("open");
+ $("finish").setAttribute("aria-hidden","true");
+
+ resetCamera();
+ render();
+}
+
+$("reset").onclick=reset;
+
+$("replay").onclick=()=>{
+ completed=0;
+ save();
+
+ $("finish").classList.remove("open");
+ $("finish").setAttribute("aria-hidden","true");
+
+ resetCamera();
+ render();
+
+ $("intro").scrollIntoView({behavior:"smooth"});
+};
+
+render();
+
+/* Responsive camera recalculation */
+window.addEventListener("resize",()=>{
+ if(opened!==null){
+  moveCamera(opened);
+ }
+});
