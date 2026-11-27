@@ -1,7 +1,7 @@
 
 /* CONFIGURATION DES 8 STATIONS */
 const STATIONS = [
- {id:1,nameFr:"Rimskaïa",nameRu:"Римская",descriptionFr:"Découvrez cette station emblématique du métro de Moscou.",x:68.5,y:51.5,videoUrl:""},
+ {id:1,nameFr:"Rimskaïa",nameRu:"Римская",descriptionFr:"Découvrez cette station emblématique du métro de Moscou.",x:68.55,y:51.5,videoUrl:""},
  {id:2,nameFr:"Dostoïevskaïa",nameRu:"Достоевская",descriptionFr:"Une nouvelle étape de notre voyage souterrain.",x:31,y:35,videoUrl:""},
  {id:3,nameFr:"Krasnyé Vorota",nameRu:"Красные ворота",descriptionFr:"Poursuivez votre découverte du métro moscovite.",x:43,y:24,videoUrl:""},
  {id:4,nameFr:"Komsomolskaïa",nameRu:"Комсомольская",descriptionFr:"L'histoire et l'architecture se rencontrent ici.",x:56,y:42,videoUrl:""},
