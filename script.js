@@ -1,14 +1,14 @@
 
 /* CONFIGURATION DES 8 STATIONS */
 const STATIONS = [
- {id:1,nameFr:"Station 1",nameRu:"Станция 1",descriptionFr:"Découvrez cette station emblématique du métro de Moscou.",x:18,y:22,videoUrl:""},
- {id:2,nameFr:"Station 2",nameRu:"Станция 2",descriptionFr:"Une nouvelle étape de notre voyage souterrain.",x:31,y:35,videoUrl:""},
- {id:3,nameFr:"Station 3",nameRu:"Станция 3",descriptionFr:"Poursuivez votre découverte du métro moscovite.",x:43,y:24,videoUrl:""},
- {id:4,nameFr:"Station 4",nameRu:"Станция 4",descriptionFr:"L'histoire et l'architecture se rencontrent ici.",x:56,y:42,videoUrl:""},
- {id:5,nameFr:"Station 5",nameRu:"Станция 5",descriptionFr:"Explorez une autre facette du métro de Moscou.",x:69,y:30,videoUrl:""},
- {id:6,nameFr:"Station 6",nameRu:"Станция 6",descriptionFr:"Continuez votre itinéraire à travers la ville.",x:77,y:54,videoUrl:""},
- {id:7,nameFr:"Station 7",nameRu:"Станция 7",descriptionFr:"Encore une étape avant la fin du voyage.",x:58,y:70,videoUrl:""},
- {id:8,nameFr:"Station 8",nameRu:"Станция 8",descriptionFr:"La dernière étape de votre voyage dans le métro de Moscou.",x:34,y:76,videoUrl:""}
+ {id:1,nameFr:"Rimskaïa",nameRu:"Римская",descriptionFr:"Découvrez cette station emblématique du métro de Moscou.",x:18,y:22,videoUrl:""},
+ {id:2,nameFr:"Dostoïevskaïa",nameRu:"Достоевская",descriptionFr:"Une nouvelle étape de notre voyage souterrain.",x:31,y:35,videoUrl:""},
+ {id:3,nameFr:"Krasnyé Vorota",nameRu:"Красные ворота",descriptionFr:"Poursuivez votre découverte du métro moscovite.",x:43,y:24,videoUrl:""},
+ {id:4,nameFr:"Komsomolskaïa",nameRu:"Комсомольская",descriptionFr:"L'histoire et l'architecture se rencontrent ici.",x:56,y:42,videoUrl:""},
+ {id:5,nameFr:"Smolenskaïa",nameRu:"Смоленская",descriptionFr:"Explorez une autre facette du métro de Moscou.",x:69,y:30,videoUrl:""},
+ {id:6,nameFr:"Arbatskaïa",nameRu:"Арбатская",descriptionFr:"Continuez votre itinéraire à travers la ville.",x:77,y:54,videoUrl:""},
+ {id:7,nameFr:"Maïakovskaïa",nameRu:"Маяковская",descriptionFr:"Encore une étape avant la fin du voyage.",x:58,y:70,videoUrl:""},
+ {id:8,nameFr:"Slavianski Boulevard",nameRu:"Славянский бульвар",descriptionFr:"La dernière étape de votre voyage dans le métro de Moscou.",x:34,y:76,videoUrl:""}
 ];
 
 const $=id=>document.getElementById(id);
